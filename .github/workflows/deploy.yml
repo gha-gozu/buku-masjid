@@ -3,6 +3,18 @@ name: CI
 on: push
 
 jobs:
+  test-js:
+    name: Test JavaScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run JavaScript tests
+        run: npm run test:js
+
   compile-assets:
     name: Compile assets
     runs-on: ubuntu-latest
