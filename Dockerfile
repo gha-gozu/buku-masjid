@@ -53,6 +53,9 @@ RUN sed 's/DB_HOST=127.0.0.1/DB_HOST=mysql_host/' .env.tmp > .env && rm .env.tmp
 RUN php ./artisan key:generate && \
     php ./artisan passport:keys && \
     php ./artisan view:cache && \
-    php ./artisan route:cache && \
-    php ./artisan config:cache && \
     php ./artisan storage:link
+
+USER root:root
+# Laravel writes logs, cached views, and framework cache files at runtime as www-data.
+RUN chown -R www-data:www-data storage bootstrap/cache && \
+    chmod -R ug+rwX storage bootstrap/cache
