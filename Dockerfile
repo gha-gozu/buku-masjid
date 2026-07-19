@@ -1,14 +1,29 @@
 # ================
 # Base Stage
 # ================
-FROM serversideup/php:8.1-fpm-nginx as base
+FROM serversideup/php:8.1-fpm-nginx AS base
 ENV AUTORUN_ENABLED=false
 ENV SSL_MODE=off
 
 # ================
+# Frontend Stage
+# ================
+FROM node:16.20-bullseye-slim AS frontend
+
+WORKDIR /app
+
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --non-interactive
+
+COPY webpack.mix.js ./
+COPY resources/assets resources/assets
+COPY resources/vendor resources/vendor
+RUN yarn run prod
+
+# ================
 # Production Stage
 # ================
-FROM base as production
+FROM base AS production
 
 ENV APP_ENV=production
 ENV APP_DEBUG=false
@@ -28,6 +43,7 @@ USER $PUID:$PGID
 # Copy contents.
 # - To ignore files or folders, use .dockerignore
 COPY --chown=$PUID:$PGID . .
+COPY --from=frontend --chown=$PUID:$PGID /app/public ./public
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction --no-progress --ansi
 COPY .env.example .env.tmp
