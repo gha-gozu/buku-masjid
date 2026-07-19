@@ -1,6 +1,22 @@
 // Iqamah and Shalat Modal Logic
 document.addEventListener('DOMContentLoaded', function() {
-    const STORAGE_KEY = 'public_display_active_modal';
+    const modalState = window.PublicDisplayModalState;
+    if (!modalState) {
+        console.error('Public display modal state helpers are not loaded.');
+        return;
+    }
+
+    const {
+        STORAGE_KEY,
+        createIqamahState,
+        createShalatState,
+        createFridayState,
+        formatCountdown,
+        getRemainingMilliseconds,
+        getRemainingSeconds,
+        hasModalExpired,
+        parseModalState,
+    } = modalState;
     const shalatModal = document.getElementById('shalatModal');
     const iqamahIntervalModal = document.getElementById('iqamahIntervalModal');
     const fridayModal = document.getElementById('fridayModal');
@@ -12,80 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let closeWatcherInterval = null;
     let shalatCountdownInterval = null;
     let activeModalType = null;
-
-    function createIqamahState(shalatKey, countdownEndsAt, now) {
-        return {
-            type: 'iqamah',
-            shalatKey,
-            startedAt: now,
-            endsAt: countdownEndsAt,
-            countdownEndsAt,
-        };
-    }
-
-    function createShalatState(shalatKey, endsAt, now) {
-        return {
-            type: 'shalat',
-            shalatKey,
-            startedAt: now,
-            endsAt,
-        };
-    }
-
-    function createFridayState(endsAt, now) {
-        return {
-            type: 'friday',
-            startedAt: now,
-            endsAt,
-        };
-    }
-
-    function getRemainingSeconds(endsAt, now) {
-        return Math.max(0, Math.ceil((endsAt - now) / 1000));
-    }
-
-    function getRemainingMilliseconds(endsAt, now) {
-        return Math.max(0, endsAt - now);
-    }
-
-    function formatCountdown(remainingMilliseconds) {
-        const totalSeconds = Math.max(0, Math.ceil(remainingMilliseconds / 1000));
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-
-        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-
-    function hasModalExpired(endsAt, now) {
-        return now >= endsAt;
-    }
-
-    function parseModalState(rawState) {
-        try {
-            const state = JSON.parse(rawState);
-            if (!state || typeof state !== 'object') {
-                return null;
-            }
-            if (!['iqamah', 'shalat', 'friday'].includes(state.type)) {
-                return null;
-            }
-            if (!Number.isFinite(state.startedAt) || !Number.isFinite(state.endsAt)) {
-                return null;
-            }
-            if (state.type === 'iqamah') {
-                if (typeof state.shalatKey !== 'string' || !Number.isFinite(state.countdownEndsAt)) {
-                    return null;
-                }
-            }
-            if (state.type === 'shalat' && typeof state.shalatKey !== 'string') {
-                return null;
-            }
-
-            return state;
-        } catch (error) {
-            return null;
-        }
-    }
 
     function saveModalState(state) {
         sessionStorage.setItem(STORAGE_KEY, JSON.stringify(state));
