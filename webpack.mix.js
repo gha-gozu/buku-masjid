@@ -3,6 +3,7 @@ let fs = require('fs');
 let path = require('path');
 
 const publicDisplayScripts = [
+    'shalat-schedule.js',
     'iqamah-shalat-modal.js',
     'kiosk-mode.js',
     'modal-state.js',
