@@ -104,6 +104,7 @@
         // shalatTimeData.schedules.dzuhr = '11:56';
     </script>
     <script src="{{ asset('js/public_display/next-shalat-counter.js') }}"></script>
+    <script src="{{ asset('js/public_display/modal-state.js') }}"></script>
     <script src="{{ asset('js/public_display/iqamah-shalat-modal.js') }}"></script>
     <script src="{{ asset('js/public_display/time-calculator.js') }}"></script>
     <script src="{{ asset('js/public_display/kiosk-mode.js') }}"></script>
